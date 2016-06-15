@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.os.RemoteException;
 import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,17 +25,18 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
-
+/*
+    Lior esabag
+ */
 public class MainActivity extends AppCompatActivity {
 
+    private String TAG = getPackageName() + "_" + getLocalClassName();
     BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-    ToggleButton toggleButton1;
-    // Button stressBtBtn;
+    ToggleButton toggleButton;
     String text;
     EditText number;
     TextView title, times, status;
     @SuppressWarnings("unused")
-    private ProgressBar pb;
     private ProgressDialog pd;
     ContactCreationTask task = new ContactCreationTask();
 
@@ -48,37 +50,35 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         number = (EditText) findViewById(R.id.numberEt);
-        toggleButton1 = (ToggleButton) findViewById(R.id.toggleButton1);
+        toggleButton = (ToggleButton) findViewById(R.id.toggleButton1);
         title = (TextView) findViewById(R.id.select);
         times = (TextView) findViewById(R.id.textView1);
         status = (TextView) findViewById(R.id.status);
 
-        // pb = (ProgressBar) findViewById(R.id.progressBar);
         init();
 
-        toggleButton1.setOnClickListener(new View.OnClickListener()
+        toggleButton.setOnClickListener(new View.OnClickListener()
         {
             @SuppressWarnings("unused")
             @Override
             public void onClick(View v)
             {
-
                 if (number.getText().length() > 0)
                 {
                     for (int i = 0; i < Integer.parseInt(number.getText().toString()); i++)
                     {
                         boolean res, isEnabled = mBluetoothAdapter.isEnabled();
 
-                        System.out.println("Bluetooth Adapter Before: " + mBluetoothAdapter.isEnabled());
+                        Log.i(TAG, "Bluetooth Adapter Before: " + mBluetoothAdapter.isEnabled());
 
                         if (isEnabled)
                         {
-                            toggleButton1.setText("OFF");
+                            toggleButton.setText("OFF");
                             res = toggleBluetooth(false);// disabling BT
                         }
                         else
                         {
-                            toggleButton1.setText("ON");
+                            toggleButton.setText("ON");
                             res = toggleBluetooth(true);// enabling BT
                         }
 
@@ -88,7 +88,6 @@ public class MainActivity extends AppCompatActivity {
                         }
                         catch (InterruptedException e)
                         {
-                            // TODO Auto-generated catch block
                             e.printStackTrace();
                         }
                     }
@@ -96,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else
                 {
-                    System.out.println("You must enter a number");
+                    Log.i(TAG, "You must enter a number");
                     init();
                     return;
                 }
@@ -108,26 +107,23 @@ public class MainActivity extends AppCompatActivity {
 
     private void init()
     {
-
-        // stressBtBtn.setVisibility(Button.INVISIBLE);
         number.setVisibility(EditText.INVISIBLE);
-        toggleButton1.setVisibility(Button.INVISIBLE);
+        toggleButton.setVisibility(Button.INVISIBLE);
         times.setVisibility(Button.INVISIBLE);
         status.setVisibility(TextView.INVISIBLE);
         number.setText("");
 
         if (mBluetoothAdapter.isEnabled())
-            toggleButton1.setText("OFF");
+            toggleButton.setText("OFF");
         else
-            toggleButton1.setText("ON");
+            toggleButton.setText("ON");
     }
 
     public boolean toggleBluetooth(boolean enable)
     {
-
         if (enable)
         {
-            toggleButton1.setText("OFF");
+            toggleButton.setText("OFF");
             mBluetoothAdapter.enable();
             try
             {
@@ -137,13 +133,13 @@ public class MainActivity extends AppCompatActivity {
             {
                 e.printStackTrace();
             }
-            System.out.println("Bluetooth Adapter After: " + mBluetoothAdapter.isEnabled());
+            Log.i(TAG, "Bluetooth Adapter After: " + mBluetoothAdapter.isEnabled());
 
             return true;
         }
         else
         {
-            toggleButton1.setText("ON");
+            toggleButton.setText("ON");
             mBluetoothAdapter.disable();
             try
             {
@@ -153,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
             {
                 e.printStackTrace();
             }
-            System.out.println("Bluetooth Adapter After: " + mBluetoothAdapter.isEnabled());
+            Log.i(TAG, "Bluetooth Adapter After: " + mBluetoothAdapter.isEnabled());
             return false;
         }
     }
@@ -161,7 +157,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
-
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.stress_main, menu);
         menu.add(Menu.NONE, BLUETOOTH_TEST, Menu.NONE, "Bluetooth test");
@@ -173,17 +168,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+        // Handle action bar item clicks.
         switch (item.getItemId())
         {
             case BLUETOOTH_TEST:
                 times.setText("How many times do you want to toggle?");
                 times.setVisibility(Button.VISIBLE);
-                // stressBtBtn.setVisibility(Button.VISIBLE);
                 number.setVisibility(EditText.VISIBLE);
-                toggleButton1.setVisibility(Button.VISIBLE);
+                toggleButton.setVisibility(Button.VISIBLE);
 
                 return true;
 
@@ -196,10 +188,10 @@ public class MainActivity extends AppCompatActivity {
                 times.setVisibility(EditText.VISIBLE);
                 times.setText("How many contacts do you want to create?");
                 number.setVisibility(EditText.VISIBLE);
-                toggleButton1.setVisibility(Button.VISIBLE);
+                toggleButton.setVisibility(Button.VISIBLE);
                 status.setVisibility(TextView.VISIBLE);
 
-                toggleButton1.setOnClickListener(new View.OnClickListener()
+                toggleButton.setOnClickListener(new View.OnClickListener()
                 {
                     @Override
                     public void onClick(View v)
@@ -207,7 +199,6 @@ public class MainActivity extends AppCompatActivity {
                         pd = ProgressDialog.show(MainActivity.this, "Dialog", "Generating contacts");
                         setProgressBarIndeterminate(false);
                         setProgressBarVisibility(true);
-                        // task.execute(number.getText().toString());
                         Thread th = new Thread(new Runnable()
                         {
                             @Override
@@ -215,14 +206,13 @@ public class MainActivity extends AppCompatActivity {
                             {
                                 for (int j = 1; j <= Integer.parseInt(number.getText().toString().trim()); j++)
                                 {
-                                    System.out.println("Thread #" + j + " started");
+                                    Log.i(TAG, "Thread #" + j + " started");
                                     try
                                     {
                                         Thread.sleep(1000);
                                     }
                                     catch (InterruptedException e1)
                                     {
-                                        // TODO Auto-generated catch block
                                         e1.printStackTrace();
                                     }
                                     try
@@ -231,17 +221,14 @@ public class MainActivity extends AppCompatActivity {
                                     }
                                     catch (NumberFormatException e)
                                     {
-                                        // TODO Auto-generated catch block
                                         e.printStackTrace();
                                     }
                                     catch (RemoteException e)
                                     {
-                                        // TODO Auto-generated catch block
                                         e.printStackTrace();
                                     }
                                     catch (OperationApplicationException e)
                                     {
-                                        // TODO Auto-generated catch block
                                         e.printStackTrace();
                                     }
                                 }
@@ -252,7 +239,6 @@ public class MainActivity extends AppCompatActivity {
                         th.start();
                     }
                 });
-
                 return true;
 
             default:
@@ -265,7 +251,6 @@ public class MainActivity extends AppCompatActivity {
      */
     public static class PlaceholderFragment extends Fragment
     {
-
         public PlaceholderFragment()
         {
         }
@@ -284,11 +269,9 @@ public class MainActivity extends AppCompatActivity {
         {
             env = getApplicationContext();
 
-            // for(int i = 1 ; i <= count ; i++)
-            // {
             int random = (int) (Math.random() * count + count);
 
-            System.out.println("Generating contact # : " + count);
+            Log.i(TAG, "Generating contact # : " + count);
             ContentValues values = new ContentValues();
             Uri rawContactUri = env.getContentResolver().insert(ContactsContract.RawContacts.CONTENT_URI, values);
 
@@ -304,7 +287,7 @@ public class MainActivity extends AppCompatActivity {
             // number
             // between
             // 1->count
-            System.out.println("Contact number: " + count);
+            Log.i(TAG, "Contact number: " + count);
             env.getContentResolver().insert(android.provider.ContactsContract.Data.CONTENT_URI, values);
 
             // Enter phone number
@@ -329,7 +312,7 @@ public class MainActivity extends AppCompatActivity {
         }
         catch (Exception e)
         {
-            System.out.println("Unable to create contact " + e.getStackTrace());
+            Log.i(TAG, "Unable to create contact " + e.getStackTrace());
         }
     }
 
@@ -345,30 +328,28 @@ public class MainActivity extends AppCompatActivity {
             status.setText("PRE for");
             setProgressBarIndeterminate(false);
             setProgressBarVisibility(true);
-            System.out.println(" onPreExecute() ");
+            Log.i(TAG, " onPreExecute() ");
         }
 
         @Override
         protected String doInBackground(String... urls)
         {
-
-            System.out.println(" doInBackground() + creating " + Integer.parseInt(urls[0]) + " contacts");
-
+            Log.i(TAG, " doInBackground() + creating " + Integer.parseInt(urls[0]) + " contacts");
             try
             {
-
                 for (int i = 1; i <= Integer.parseInt(urls[0]); i++)
                 {
-                    System.out.println("Contact number: " + i);
+                    Log.i(TAG, "Contact number: " + i);
 
                     ContentValues values = new ContentValues();
-                    Uri rawContactUri = getApplicationContext().getContentResolver().insert(ContactsContract.RawContacts.CONTENT_URI, values);
+                    Uri rawContactUri = getApplicationContext().getContentResolver()
+                            .insert(ContactsContract.RawContacts.CONTENT_URI, values);
 
                     long rawContactId = ContentUris.parseId(rawContactUri);
                     values.put(ContactsContract.Contacts.Data.RAW_CONTACT_ID, rawContactId);
                     values.put(ContactsContract.Contacts.Data.MIMETYPE, ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE);
                     values.put(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME, "contact_" + i);
-                    System.out.println("Contact number: " + i);
+                    Log.i(TAG, "Contact number: " + i);
                     getApplicationContext().getContentResolver().insert(android.provider.ContactsContract.Data.CONTENT_URI, values);
 
                     // Enter phone number
@@ -384,18 +365,12 @@ public class MainActivity extends AppCompatActivity {
                     getApplicationContext().getContentResolver().insert(android.provider.ContactsContract.Data.CONTENT_URI, values);
 
                     Thread.sleep(1000);
-
-                    //status.setText(" Generated : " + i + "/" + urls[0] + " contacts");
-
                     counter++;
-
-                    // publishProgress(urls[i].toString());
                 }
-
             }
             catch (Exception e)
             {
-                System.out.println("Unable to create contact " + e.getStackTrace());
+                Log.i(TAG, "Unable to create contact " + e.getStackTrace());
             }
 
             return "true";
@@ -407,7 +382,7 @@ public class MainActivity extends AppCompatActivity {
         {
             for (int i = 0; i < values.length; i++)
             {
-                System.out.println("values.length: " + values.length + " i: " + i);
+                Log.i(TAG, "values.length: " + values.length + " i: " + i);
                 status.setText(values[i]);
                 setProgress(5000);
             }
@@ -416,7 +391,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String result)
         {
-            System.out.println(" onPostExecute() ");
+            Log.i(TAG, " onPostExecute() ");
             status.setText("finished..");
             setProgressBarVisibility(false);
 
